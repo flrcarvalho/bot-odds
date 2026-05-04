@@ -6,7 +6,7 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTyp
 # ============================================================
 # CONFIGURAÇÃO — coloque seu token aqui
 # ============================================================
-BOT_TOKEN = "SEU_TOKEN_AQUI"
+BOT_TOKEN = "S8729683426:AAHjSFRHfog8bZAUBPUCNdTVlLOYNvYYj10"
 
 
 logging.basicConfig(level=logging.INFO)

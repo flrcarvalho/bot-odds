@@ -6,7 +6,7 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTyp
 # ============================================================
 # CONFIGURAÇÃO — coloque seu token aqui
 # ============================================================
-BOT_TOKEN = "8729683426:AAHjSFRHfog8bZAUBPUCNdTVlLOYNvYYj10"
+BOT_TOKEN = "SEU_TOKEN_AQUI"
 
 
 logging.basicConfig(level=logging.INFO)
@@ -37,7 +37,7 @@ def parse_picks(text: str) -> list[dict]:
     # Padrão: linha com "Pick" seguida de linha com odd americana
     # Captura: unidades, jogador/mercado, odd americana, casa
     pick_pattern = re.compile(
-        r"(MLB Pick[^:\n]*[:\-–]\s*.+)\n"          # linha do título ex: MLB Pick- Giants vs Phillies
+        r"([A-Z]{2,5}[^:\n]*Pick[^:\n]*[:\-–]\s*.+)\n"  # linha do título ex: MLB Pick-, NBA Playoffs Pick-
         r"([0-9.]+u)\s*:\s*(.+?)\s+([+-]\d+)\s+\((\w+)\)",
         re.IGNORECASE,
     )

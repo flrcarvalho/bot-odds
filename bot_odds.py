@@ -112,11 +112,20 @@ def format_response(picks: list[dict]) -> str:
 # ============================================================
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text or ""
+    chat_id = update.message.chat_id
+    chat_type = update.message.chat.type
+    print(f"[MSG RECEBIDA] chat_id={chat_id} tipo={chat_type}")
+    print(f"[TEXTO] {repr(text[:200])}")
+
     picks = parse_picks(text)
+    print(f"[PICKS] {picks}")
+
     response = format_response(picks)
 
     if response:
         await update.message.reply_text(response, parse_mode="Markdown")
+    else:
+        print("[SEM RESPOSTA] nenhum pick encontrado")
 
 
 # ============================================================

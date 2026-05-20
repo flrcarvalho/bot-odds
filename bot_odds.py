@@ -28,24 +28,32 @@ HOUSE_NAMES = {
 # DICIONÁRIO DE MERCADOS
 # ============================================================
 MARKET_TRANSLATIONS = {
-    # MLB — Pitcher Props
-    "K":    {"under": "Under {n} Strikeouts",       "over": "Over {n} Strikeouts",       "desc": "strikeouts (ponches) do pitcher"},
-    "HA":   {"under": "Under {n} Hits Allowed",     "over": "Over {n} Hits Allowed",     "desc": "rebatidas (hits) permitidas pelo pitcher"},
-    "ER":   {"under": "Under {n} Earned Runs",      "over": "Over {n} Earned Runs",      "desc": "corridas sofridas pelo pitcher"},
-    "BB":   {"under": "Under {n} Walks",            "over": "Over {n} Walks",            "desc": "bases por bola (walks) concedidas pelo pitcher"},
-    "outs": {"under": "Under {n} Outs (~{inn} inn)", "over": "Over {n} Outs (~{inn} inn)", "desc": "eliminações registradas (~{inn} innings)"},
-    # NBA / WNBA — Player Props
-    "PRA":      {"under": "Under {n} Pts+Reb+Ast",      "over": "Over {n} Pts+Reb+Ast",      "desc": "Pontos + Rebotes + Assistências"},
-    "points":   {"under": "Under {n} Pontos",           "over": "Over {n} Pontos",           "desc": "pontos marcados pelo jogador"},
-    "assists":  {"under": "Under {n} Assistências",     "over": "Over {n} Assistências",     "desc": "assistências do jogador"},
-    "rebounds": {"under": "Under {n} Rebotes",          "over": "Over {n} Rebotes",          "desc": "rebotes do jogador"},
-    "PR":       {"under": "Under {n} Pts+Reb",          "over": "Over {n} Pts+Reb",          "desc": "Pontos + Rebotes"},
-    "PA":       {"under": "Under {n} Pts+Ast",          "over": "Over {n} Pts+Ast",          "desc": "Pontos + Assistências"},
-    "RA":       {"under": "Under {n} Reb+Ast",          "over": "Over {n} Reb+Ast",          "desc": "Rebotes + Assistências"},
-    "3PM":      {"under": "Under {n} Cestas de 3pts",   "over": "Over {n} Cestas de 3pts",   "desc": "cestas de 3 pontos convertidas"},
-    "blocks":   {"under": "Under {n} Bloqueios",        "over": "Over {n} Bloqueios",        "desc": "bloqueios (tocos) do jogador"},
-    "steals":   {"under": "Under {n} Roubos de Bola",   "over": "Over {n} Roubos de Bola",   "desc": "roubos de bola do jogador"},
-    "mins":     {"under": "Under {n} Minutos",          "over": "Over {n} Minutos",          "desc": "minutos em quadra"},
+    # ── MLB — Lançador (nomes Bet365 BR) ──────────────────────────────
+    "K":        {"under": "Menos de {n} Strikeouts",               "over": "Mais de {n} Strikeouts",               "desc": "Lançador - Strikeouts (Mais de/Menos de)"},
+    "HA":       {"under": "Menos de {n} Hits Permitidos",          "over": "Mais de {n} Hits Permitidos",          "desc": "Lançador - Hits Permitidos (Mais de/Menos de)"},
+    "ER":       {"under": "Menos de {n} Earned Runs",              "over": "Mais de {n} Earned Runs",              "desc": "Pitcher Earned Runs O/U"},
+    "BB":       {"under": "Menos de {n} Walks Atribuídos",         "over": "Mais de {n} Walks Atribuídos",         "desc": "Lançador - Walks Atribuídos (Mais de/Menos de)"},
+    "outs":     {"under": "Menos de {n} Outs (~{inn} inn)",        "over": "Mais de {n} Outs (~{inn} inn)",        "desc": "Lançador - Outs (Mais de/Menos de)"},
+    # ── MLB — Rebatedor (nomes Bet365 BR) ─────────────────────────────
+    "hits":     {"under": "Menos de {n} Hits",                     "over": "Mais de {n} Hits",                     "desc": "Hits (Mais de/Menos de)"},
+    "HR":       {"under": "Menos de {n} Home Runs",                "over": "Mais de {n} Home Runs",                "desc": "Home Runs (Mais de/Menos de)"},
+    "RBI":      {"under": "Menos de {n} Runs Batted In",           "over": "Mais de {n} Runs Batted In",           "desc": "Runs Batted In (Mais de/Menos de)"},
+    "runs":     {"under": "Menos de {n} Runs",                     "over": "Mais de {n} Runs",                     "desc": "Runs (Mais de/Menos de)"},
+    "TB":       {"under": "Menos de {n} Total de Bases",           "over": "Mais de {n} Total de Bases",           "desc": "Total de Bases (Mais de/Menos de)"},
+    "HRR":      {"under": "Menos de {n} Total Hits+Runs+RBIs",     "over": "Mais de {n} Total Hits+Runs+RBIs",     "desc": "Total de Hits, Runs e RBIs"},
+    "SB":       {"under": "Menos de {n} Bases Roubadas",           "over": "Mais de {n} Bases Roubadas",           "desc": "Bases Roubadas (Mais de/Menos de)"},
+    # ── NBA / WNBA — Player Props ──────────────────────────────────────
+    "PRA":      {"under": "Menos de {n} Pts+Reb+Ast",              "over": "Mais de {n} Pts+Reb+Ast",              "desc": "Pontos + Rebotes + Assistências do jogador"},
+    "points":   {"under": "Menos de {n} Pontos",                   "over": "Mais de {n} Pontos",                   "desc": "Pontos marcados pelo jogador"},
+    "assists":  {"under": "Menos de {n} Assistências",             "over": "Mais de {n} Assistências",             "desc": "Assistências do jogador"},
+    "rebounds": {"under": "Menos de {n} Rebotes",                  "over": "Mais de {n} Rebotes",                  "desc": "Rebotes do jogador"},
+    "PR":       {"under": "Menos de {n} Pts+Reb",                  "over": "Mais de {n} Pts+Reb",                  "desc": "Pontos + Rebotes do jogador"},
+    "PA":       {"under": "Menos de {n} Pts+Ast",                  "over": "Mais de {n} Pts+Ast",                  "desc": "Pontos + Assistências do jogador"},
+    "RA":       {"under": "Menos de {n} Reb+Ast",                  "over": "Mais de {n} Reb+Ast",                  "desc": "Rebotes + Assistências do jogador"},
+    "3PM":      {"under": "Menos de {n} Cestas de 3 Pontos",       "over": "Mais de {n} Cestas de 3 Pontos",       "desc": "Cestas de 3 pontos convertidas"},
+    "blocks":   {"under": "Menos de {n} Bloqueios",                "over": "Mais de {n} Bloqueios",                "desc": "Bloqueios (tocos) do jogador"},
+    "steals":   {"under": "Menos de {n} Roubos de Bola",           "over": "Mais de {n} Roubos de Bola",           "desc": "Roubos de bola do jogador"},
+    "mins":     {"under": "Menos de {n} Minutos",                  "over": "Mais de {n} Minutos",                  "desc": "Minutos em quadra"},
 }
 
 # ============================================================
@@ -200,23 +208,16 @@ def format_response(picks: list[dict]) -> str:
         # Mercado traduzido
         market_line = f"{mkt['direction_sym']} {mkt['line']} {mkt['code']} → {mkt['label']}" if mkt["direction"] else p["market"]
 
-        # Glossário dinâmico
+        # Glossário dinâmico — só o mercado
         glossary = []
         if mkt["desc"]:
-            glossary.append(f"• `{mkt['direction'].upper() if mkt['direction'] else ''}{mkt['line']} {mkt['code']}` → {mkt['desc']}")
+            glossary.append(f"• `{(mkt['direction'] or '').upper()}{mkt['line']} {mkt['code']}` → {mkt['desc']}")
 
-        unit_map = {".5u": "meia unidade — aposta pequena/especulativa", "1u": "1 unidade — pick padrão", "2u": "2 unidades — alta convicção"}
-        glossary.append(f"• `{units}` → {unit_map.get(units, 'unidades de aposta')}")
+        glossary_text = "\n".join(glossary) if glossary else ""
 
-        if odd_am > 0:
-            glossary.append(f"• `{odd_str}` → azarão — lucro de R${odd_am} para cada R$100 apostados")
-        else:
-            glossary.append(f"• `{odd_str}` → favorito — aposte R${abs(odd_am)} para lucrar R$100")
+        glossary_block = f"\n📖 *O que significa:*\n{glossary_text}" if glossary_text else ""
 
-        glossary_text = "\n".join(glossary)
-
-        # Busca equivalente
-        # Termo de busca: pega a parte descritiva do label (ex: "Hits Allowed", "Strikeouts")
+        # Termo de busca: parte descritiva do label
         label_words = mkt['label'].split()
         search_term = " ".join(label_words[2:]) if len(label_words) > 2 else mkt['code']
 
@@ -225,9 +226,8 @@ def format_response(picks: list[dict]) -> str:
             f"💰 *{units}*\n"
             f"🎟️ {p['market']} → {mkt['label']}\n"
             f"📈 Odd americana: `{odd_str}` → Odd decimal: *{odd_br}*\n"
-            f"🏡 Casa: {house} 🇺🇸\n\n"
-            f"📖 *O que significa:*\n"
-            f"{glossary_text}\n\n"
+            f"🏡 Casa: {house} 🇺🇸"
+            f"{glossary_block}\n\n"
             f"⚠️ _{house} é uma casa americana. Busque \"{search_term}\" na Bet365 ou Betano._\n"
         )
 

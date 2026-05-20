@@ -27,37 +27,62 @@ def american_to_decimal(american: int) -> float:
 # ============================================================
 def parse_picks(text: str) -> list[dict]:
     """
-    Extrai picks da mensagem no formato:
-      MLB Pick- Time A vs Time B
+    Extrai picks da mensagem nos formatos:
+      MLB Pick- Time A vs Time B          (SharpDuel Bot)
+      MLB Pick #4- Time A vs Time B       (theundergroundlab24)
       Xu: Jogador mercado odd (casa)
+      Xu: Jogador mercado odd(casa)       (sem espaço antes do parêntese)
+      Xu: Jogador mercadoodd (casa)       (odd colada no mercado, ex: BB-113)
+
     Retorna lista de dicts com os dados de cada pick.
     """
     picks = []
 
-    # Padrão: linha com "Pick" seguida de linha com odd americana
-    # Captura: unidades, jogador/mercado, odd americana, casa
-    pick_pattern = re.compile(
-        r"([A-Z]{2,5}[^:\n]*Pick[^:\n]*[:\-–]\s*.+)\n"  # linha do título ex: MLB Pick-, NBA Playoffs Pick-
-        r"([0-9.]+u)\s*:\s*(.+?)\s+([+-]\d+)\s+\((\w+)\)",
-        re.IGNORECASE,
+    # Linha de título: qualquer coisa com "Pick" seguida de separador
+    title_pattern = re.compile(
+        r"^([A-Z]{2,5}[^:\n]*Pick[^:\n]*[-–:]\s*.+)$",
+        re.IGNORECASE | re.MULTILINE,
     )
 
-    for m in pick_pattern.finditer(text):
-        title    = m.group(1).strip()
-        units    = m.group(2).strip()
-        market   = m.group(3).strip()
-        odd_am   = int(m.group(4))
-        house    = m.group(5).strip()
-        odd_br   = american_to_decimal(odd_am)
+    # Linha de pick:
+    #   unidades (ex: 1u, .5u, 0.5u)
+    #   : mercado (qualquer texto)
+    #   odd americana (+/-NNN) — pode estar colada ao mercado ou separada por espaço
+    #   (casa) — com ou sem espaço antes do parêntese
+    pick_line_pattern = re.compile(
+        r"^(\d*\.?\d+u)\s*:\s*(.+?)\s*([+-]\d{2,4})\s*\((\w+)\)\s*$",
+        re.IGNORECASE | re.MULTILINE,
+    )
 
-        picks.append({
-            "title":  title,
-            "units":  units,
-            "market": market,
-            "odd_am": odd_am,
-            "odd_br": odd_br,
-            "house":  house,
-        })
+    # Encontra todos os títulos e suas posições
+    titles = [(m.start(), m.group(1).strip()) for m in title_pattern.finditer(text)]
+
+    if not titles:
+        return picks
+
+    # Para cada título, procura a linha de pick imediatamente após
+    for i, (title_pos, title_text) in enumerate(titles):
+        # Delimita a busca: do fim do título até o próximo título (ou fim do texto)
+        search_start = title_pos + len(title_text)
+        search_end = titles[i + 1][0] if i + 1 < len(titles) else len(text)
+        segment = text[search_start:search_end]
+
+        m = pick_line_pattern.search(segment)
+        if m:
+            units   = m.group(1).strip()
+            market  = m.group(2).strip()
+            odd_am  = int(m.group(3))
+            house   = m.group(4).strip()
+            odd_br  = american_to_decimal(odd_am)
+
+            picks.append({
+                "title":  title_text,
+                "units":  units,
+                "market": market,
+                "odd_am": odd_am,
+                "odd_br": odd_br,
+                "house":  house,
+            })
 
     return picks
 

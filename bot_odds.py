@@ -71,11 +71,17 @@ def get_sport_emoji(title: str) -> str:
 # ============================================================
 # CONVERSÃO DE ODD AMERICANA → DECIMAL
 # ============================================================
+def excel_round(value: float, decimals: int) -> float:
+    """Arredondamento igual ao Excel (half up)."""
+    import math
+    factor = 10 ** decimals
+    return math.floor(value * factor + 0.5) / factor
+
 def american_to_decimal(american: int) -> float:
     if american < 0:
-        return round((100 + abs(american)) / abs(american), 2)
+        return excel_round((100 + abs(american)) / abs(american), 2)
     else:
-        return round((american + 100) / 100, 2)
+        return excel_round((american + 100) / 100, 2)
 
 # ============================================================
 # PARSER DA MENSAGEM
@@ -196,17 +202,23 @@ def format_response(picks: list[dict]) -> str:
     for p in picks:
         odd_am  = p["odd_am"]
         odd_br  = p["odd_br"]
+        odd_min = excel_round(odd_br * 0.96, 2)
         house   = HOUSE_NAMES.get(p["house"], p["house"])
         odd_str = f"+{odd_am}" if odd_am > 0 else str(odd_am)
-        units   = p["units"]
-        mkt     = interpret_market(p["market"])
+
+        # Formata odd decimal com vírgula (padrão BR) e 2 casas sempre
+        odd_br_str  = f"{odd_br:.2f}".replace(".", ",")
+        odd_min_str = f"{odd_min:.2f}".replace(".", ",")
+
+        # Normaliza unidades: .5u → 0.5u
+        units_raw = p["units"]
+        units = re.sub(r'^\.(\d)', r'0.\1', units_raw)
+
+        mkt = interpret_market(p["market"])
 
         # Título com emoji de esporte
         sport_emoji = get_sport_emoji(p["title"])
         title_line = f"{sport_emoji} *{p['title']}*" if p["title"] else "🎲 *Pick detectado*"
-
-        # Mercado traduzido
-        market_line = f"{mkt['direction_sym']} {mkt['line']} {mkt['code']} → {mkt['label']}" if mkt["direction"] else p["market"]
 
         # Glossário dinâmico — só o mercado
         glossary = []
@@ -214,7 +226,6 @@ def format_response(picks: list[dict]) -> str:
             glossary.append(f"• `{(mkt['direction'] or '').upper()}{mkt['line']} {mkt['code']}` → {mkt['desc']}")
 
         glossary_text = "\n".join(glossary) if glossary else ""
-
         glossary_block = f"\n📖 *O que significa:*\n{glossary_text}" if glossary_text else ""
 
         # Termo de busca: parte descritiva do label
@@ -225,10 +236,12 @@ def format_response(picks: list[dict]) -> str:
             f"{title_line}\n"
             f"💰 *{units}*\n"
             f"🎟️ {p['market']} → {mkt['label']}\n"
-            f"📈 Odd americana: `{odd_str}` → Odd decimal: *{odd_br}*\n"
+            f"📉 Odd americana: `{odd_str}`\n"
+            f"📈 Odd decimal: *{odd_br_str}*\n"
+            f"🚫 Odd mínima: *{odd_min_str}*\n"
             f"🏡 Casa: {house} 🇺🇸"
             f"{glossary_block}\n\n"
-            f"⚠️ _{house} é uma casa americana. Busque \"{search_term}\" na Bet365 ou Betano._\n"
+            f"⚠️ Busque \"{search_term}\" em casas brasileiras.\n"
         )
 
     return "\n".join(lines)

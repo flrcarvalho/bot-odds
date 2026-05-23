@@ -1,6 +1,6 @@
 import logging
 import os
-import psycopg2
+import asyncpg
 from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ContextTypes
 from telegram.constants import ParseMode
@@ -15,39 +15,39 @@ BOT_TOKEN      = "8985257228:AAFqxNiOza219IYoK-wh4KenzNxD_8OEnGA"
 SOURCE_CHAT_ID = -1003726885598
 DEST_CHAT_ID   = -1003891414309
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:ZvgIRmrRwvJUGmwNMkniZovbtnpdKSUs@postgres.railway.internal:5432/railway")
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://postgres:ZvgIRmrRwvJUGmwNMkniZovbtnpdKSUs@postgres.railway.internal:5432/railway"
+)
 
-def get_conn():
-    return psycopg2.connect(DATABASE_URL)
+db_pool = None
 
-def init_db():
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS message_map (
-                    source_msg_id BIGINT PRIMARY KEY,
-                    dest_msg_id   BIGINT NOT NULL
-                )
-            """)
-        conn.commit()
+async def init_db():
+    global db_pool
+    db_pool = await asyncpg.create_pool(DATABASE_URL)
+    async with db_pool.acquire() as conn:
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS message_map (
+                source_msg_id BIGINT PRIMARY KEY,
+                dest_msg_id   BIGINT NOT NULL
+            )
+        """)
     logger.info("Banco inicializado.")
 
-def save_mapping(source_id: int, dest_id: int):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO message_map (source_msg_id, dest_msg_id)
-                VALUES (%s, %s)
-                ON CONFLICT (source_msg_id) DO UPDATE SET dest_msg_id = EXCLUDED.dest_msg_id
-            """, (source_id, dest_id))
-        conn.commit()
+async def save_mapping(source_id: int, dest_id: int):
+    async with db_pool.acquire() as conn:
+        await conn.execute("""
+            INSERT INTO message_map (source_msg_id, dest_msg_id)
+            VALUES ($1, $2)
+            ON CONFLICT (source_msg_id) DO UPDATE SET dest_msg_id = EXCLUDED.dest_msg_id
+        """, source_id, dest_id)
 
-def get_mapping(source_id: int) -> int | None:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT dest_msg_id FROM message_map WHERE source_msg_id = %s", (source_id,))
-            row = cur.fetchone()
-            return row[0] if row else None
+async def get_mapping(source_id: int):
+    async with db_pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT dest_msg_id FROM message_map WHERE source_msg_id = $1", source_id
+        )
+        return row["dest_msg_id"] if row else None
 
 def is_under(text: str) -> bool:
     return "UNDER" in text.upper()
@@ -58,7 +58,7 @@ def format_message(text: str) -> str:
     if text.upper().startswith("ATENTOS"):
         return f"⚠️ *ATENÇÃO* ⚠️\n\n{text}"
 
-    if "UNDER" in (lines[0].upper() if lines else "") and len(lines) >= 4:
+    if lines and "UNDER" in lines[0].upper() and len(lines) >= 4:
         title   = lines[0]
         line    = lines[1] if len(lines) > 1 else ""
         stake   = lines[2] if len(lines) > 2 else ""
@@ -105,7 +105,7 @@ async def handle_new_message(update: Update, context: ContextTypes.DEFAULT_TYPE)
             text=formatted,
             parse_mode=ParseMode.MARKDOWN
         )
-        save_mapping(message.message_id, sent.message_id)
+        await save_mapping(message.message_id, sent.message_id)
         logger.info(f"Enviado: origem {message.message_id} -> destino {sent.message_id}")
     except Exception as e:
         logger.error(f"Erro ao enviar: {e}")
@@ -119,7 +119,7 @@ async def handle_edited_message(update: Update, context: ContextTypes.DEFAULT_TY
     if not is_under(text):
         return
 
-    dest_msg_id = get_mapping(message.message_id)
+    dest_msg_id = await get_mapping(message.message_id)
     if not dest_msg_id:
         logger.info(f"Edição sem mapeamento para {message.message_id} — enviando como nova.")
         update.message = message
@@ -140,9 +140,11 @@ async def handle_edited_message(update: Update, context: ContextTypes.DEFAULT_TY
     except Exception as e:
         logger.error(f"Erro ao editar: {e}")
 
+async def post_init(app):
+    await init_db()
+
 def main():
-    init_db()
-    app = Application.builder().token(BOT_TOKEN).build()
+    app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     app.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND, handle_new_message))
     app.add_handler(MessageHandler(filters.UpdateType.EDITED_MESSAGE, handle_edited_message))
     logger.info("Bot iniciado. Aguardando mensagens...")

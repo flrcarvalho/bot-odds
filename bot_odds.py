@@ -1,5 +1,7 @@
 import re
+import math
 import logging
+from html import escape
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
@@ -73,7 +75,6 @@ def get_sport_emoji(title: str) -> str:
 # ============================================================
 def excel_round(value: float, decimals: int) -> float:
     """Arredondamento igual ao Excel (half up)."""
-    import math
     factor = 10 ** decimals
     return math.floor(value * factor + 0.5) / factor
 
@@ -87,24 +88,12 @@ def american_to_decimal(american: int) -> float:
 # PARSER DA MENSAGEM
 # ============================================================
 def parse_picks(text: str) -> list[dict]:
-    """
-    Suporta os formatos:
-      - MLB Pick- Time A vs Time B           (SharpDuel Bot)
-      - MLB Pick #4- Time A vs Time B        (numerado)
-      - **MLB Pick #2- ...**                 (com markdown **)
-      - MLB Pick Thursday- ...              (com dia da semana)
-      - Xu: Jogador mercado odd (casa)
-      - Xu Jogador mercado odd (casa)        (sem dois pontos)
-      - K + 114                              (espaço no sinal)
-      - BB-113                              (odd colada ao mercado)
-      - picks sem título (mensagem isolada)
-    """
     picks = []
 
     # Remove marcação markdown **...**
     text_clean = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)
 
-    # Padrão título: ex. "MLB Pick-", "NBA Playoffs Pick #2-", "MLB Pick Thursday-"
+    # Padrão título
     title_pattern = re.compile(
         r'^(\*{0,2}[A-Z]{2,5}[^:\n]*Pick[^:\n]*[-–:]\s*.+?)\*{0,2}$',
         re.IGNORECASE | re.MULTILINE,
@@ -135,7 +124,6 @@ def parse_picks(text: str) -> list[dict]:
                     "house":   m.group(4).strip(),
                 })
     else:
-        # Sem título: tenta capturar pick isolado
         m = pick_line_pattern.search(text_clean)
         if m:
             odd_am = int(m.group(3).replace(" ", ""))
@@ -154,11 +142,6 @@ def parse_picks(text: str) -> list[dict]:
 # INTERPRETA O MERCADO
 # ============================================================
 def interpret_market(market_raw: str) -> dict:
-    """
-    Recebe 'u4.5 K', 'Jogador u4.5 K', 'o2.5 ER', etc.
-    Extrai a parte de mercado (direção + linha + código) mesmo que venha precedida do nome do jogador.
-    """
-    # Tenta encontrar padrão [u/o][número] [código] em qualquer posição da string
     m = re.search(r'([uo])([\d.]+)\s+([A-Za-z]+)(?:\s|$)', market_raw.strip(), re.IGNORECASE)
     if not m:
         m = re.match(r'^([uo])([\d.]+)\s*(.+)$', market_raw.strip(), re.IGNORECASE)
@@ -170,20 +153,17 @@ def interpret_market(market_raw: str) -> dict:
     code      = m.group(3).strip()
 
     direction_word = "under" if direction == "u" else "over"
-    direction_sym  = "🔵 UNDER" if direction == "u" else "🔴 OVER"
 
     mkt = MARKET_TRANSLATIONS.get(code, {})
     label_tmpl = mkt.get(direction_word, f"{direction.upper()}{line} {code}")
     desc_tmpl  = mkt.get("desc", None)
 
-    # Substitui {n} e {inn}
     innings = str(round(float(line) / 3, 1)) if code == "outs" else ""
     label = label_tmpl.replace("{n}", line).replace("{inn}", innings)
     desc  = desc_tmpl.replace("{n}", line).replace("{inn}", innings) if desc_tmpl else None
 
     return {
         "direction": direction,
-        "direction_sym": direction_sym,
         "line": line,
         "code": code,
         "label": label,
@@ -191,13 +171,13 @@ def interpret_market(market_raw: str) -> dict:
     }
 
 # ============================================================
-# FORMATA A RESPOSTA
+# FORMATA A RESPOSTA (HTML)
 # ============================================================
-def format_response(picks: list[dict]) -> str:
+def format_response(picks: list[dict], original_text: str) -> str:
     if not picks:
         return None
 
-    lines = ["🎯 *Odds convertidas (padrão BR):*\n"]
+    blocks = []
 
     for p in picks:
         odd_am  = p["odd_am"]
@@ -206,70 +186,89 @@ def format_response(picks: list[dict]) -> str:
         house   = HOUSE_NAMES.get(p["house"], p["house"])
         odd_str = f"+{odd_am}" if odd_am > 0 else str(odd_am)
 
-        # Formata odd decimal com vírgula (padrão BR) e 2 casas sempre
         odd_br_str  = f"{odd_br:.2f}".replace(".", ",")
         odd_min_str = f"{odd_min:.2f}".replace(".", ",")
 
-        # Normaliza unidades: .5u → 0.5u
-        units_raw = p["units"]
-        units = re.sub(r'^\.(\d)', r'0.\1', units_raw)
+        units = re.sub(r'^\.(\d)', r'0.\1', p["units"])
 
         mkt = interpret_market(p["market"])
 
-        # Título com emoji de esporte
         sport_emoji = get_sport_emoji(p["title"])
-        title_line = f"{sport_emoji} *{p['title']}*" if p["title"] else "🎲 *Pick detectado*"
+        title_str   = escape(p["title"]) if p["title"] else "Pick detectado"
+        title_line  = f"{sport_emoji} <b>{title_str}</b>"
 
-        # Glossário dinâmico — só o mercado
-        glossary = []
+        label_esc  = escape(mkt["label"])
+        market_esc = escape(p["market"])
+
+        glossary_block = ""
         if mkt["desc"]:
-            glossary.append(f"• `{(mkt['direction'] or '').upper()}{mkt['line']} {mkt['code']}` → {mkt['desc']}")
+            code_tag = f"{(mkt['direction'] or '').upper()}{mkt['line']} {mkt['code']}"
+            glossary_block = (
+                f"\n📖 <b>O que significa:</b>\n"
+                f"• <code>{escape(code_tag)}</code> → {escape(mkt['desc'])}"
+            )
 
-        glossary_text = "\n".join(glossary) if glossary else ""
-        glossary_block = f"\n📖 *O que significa:*\n{glossary_text}" if glossary_text else ""
+        label_words = mkt["label"].split()
+        search_term = escape(" ".join(label_words[2:]) if len(label_words) > 2 else mkt["code"])
 
-        # Termo de busca: parte descritiva do label
-        label_words = mkt['label'].split()
-        search_term = " ".join(label_words[2:]) if len(label_words) > 2 else mkt['code']
-
-        lines.append(
+        block = (
             f"{title_line}\n"
-            f"💰 *{units}*\n"
-            f"🎟️ {p['market']} → {mkt['label']}\n"
-            f"📉 Odd americana: `{odd_str}`\n"
-            f"📈 Odd decimal: *{odd_br_str}*\n"
-            f"🚫 Odd mínima: *{odd_min_str}*\n"
-            f"🏡 Casa: {house} 🇺🇸"
+            f"💰 <b>{escape(units)}</b>\n"
+            f"🎟️ {market_esc} → {label_esc}\n"
+            f"📉 Odd americana: <code>{odd_str}</code>\n"
+            f"📈 Odd decimal: <b>{odd_br_str}</b>\n"
+            f"🚫 Odd mínima: <b>{odd_min_str}</b>\n"
+            f"🏡 Casa: {escape(house)} 🇺🇸"
             f"{glossary_block}\n\n"
-            f"⚠️ Busque \"{search_term}\" em casas brasileiras.\n"
+            f"⚠️ Busque \"{search_term}\" em casas brasileiras."
         )
+        blocks.append(block)
 
-    return "\n".join(lines)
+    # Blockquote com texto original no rodapé
+    original_block = f"\n\n<blockquote>{escape(original_text.strip())}</blockquote>"
+
+    return "\n\n".join(blocks) + original_block
 
 # ============================================================
 # HANDLER
 # ============================================================
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text or ""
+    try:
+        if not update.message:
+            return
+        if not update.message.text:
+            return
 
-    # Ignora respostas do próprio bot
-    if "Odd americana:" in text or "Odds convertidas" in text:
-        return
+        text = update.message.text
 
-    chat_id  = update.message.chat_id
-    chat_type = update.message.chat.type
-    print(f"[MSG] chat_id={chat_id} tipo={chat_type}")
-    print(f"[TEXTO] {repr(text[:200])}")
+        # Ignora respostas do próprio bot
+        if "Odd americana:" in text or "Odds convertidas" in text:
+            return
 
-    picks = parse_picks(text)
-    print(f"[PICKS] {picks}")
+        chat_id   = update.message.chat_id
+        chat_type = update.message.chat.type
+        print(f"[MSG] chat_id={chat_id} tipo={chat_type}")
+        print(f"[TEXTO] {repr(text[:200])}")
 
-    response = format_response(picks)
+        picks = parse_picks(text)
+        print(f"[PICKS] {picks}")
 
-    if response:
-        await update.message.reply_text(response, parse_mode="Markdown")
-    else:
-        print("[SEM RESPOSTA] nenhum pick encontrado")
+        response = format_response(picks, text)
+
+        if response:
+            # Envia a mensagem convertida
+            await context.bot.send_message(
+                chat_id=chat_id,
+                text=response,
+                parse_mode="HTML",
+            )
+            # Deleta a mensagem original
+            await update.message.delete()
+        else:
+            print("[SEM RESPOSTA] nenhum pick encontrado")
+
+    except Exception as e:
+        print(f"[ERRO] {e}")
 
 # ============================================================
 # MAIN
@@ -278,7 +277,7 @@ def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     print("✅ Bot rodando! Aguardando mensagens...")
-    app.run_polling()
+    app.run_polling(allowed_updates=["message"])
 
 if __name__ == "__main__":
     main()

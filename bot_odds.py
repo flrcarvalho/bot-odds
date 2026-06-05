@@ -30,32 +30,53 @@ HOUSE_NAMES = {
 # DICIONÁRIO DE MERCADOS
 # ============================================================
 MARKET_TRANSLATIONS = {
-    # ── MLB — Lançador (nomes Bet365 BR) ──────────────────────────────
-    "K":        {"under": "Menos de {n} Strikeouts",               "over": "Mais de {n} Strikeouts",               "desc": "Lançador - Strikeouts (Mais de/Menos de)"},
-    "HA":       {"under": "Menos de {n} Hits Permitidos",          "over": "Mais de {n} Hits Permitidos",          "desc": "Lançador - Hits Permitidos (Mais de/Menos de)"},
-    "ER":       {"under": "Menos de {n} Earned Runs",              "over": "Mais de {n} Earned Runs",              "desc": "Pitcher Earned Runs O/U"},
-    "BB":       {"under": "Menos de {n} Walks Atribuídos",         "over": "Mais de {n} Walks Atribuídos",         "desc": "Lançador - Walks Atribuídos (Mais de/Menos de)"},
-    "outs":     {"under": "Menos de {n} Outs (~{inn} inn)",        "over": "Mais de {n} Outs (~{inn} inn)",        "desc": "Lançador - Outs (Mais de/Menos de)"},
-    # ── MLB — Rebatedor (nomes Bet365 BR) ─────────────────────────────
-    "hits":     {"under": "Menos de {n} Hits",                     "over": "Mais de {n} Hits",                     "desc": "Hits (Mais de/Menos de)"},
-    "HR":       {"under": "Menos de {n} Home Runs",                "over": "Mais de {n} Home Runs",                "desc": "Home Runs (Mais de/Menos de)"},
-    "RBI":      {"under": "Menos de {n} Runs Batted In",           "over": "Mais de {n} Runs Batted In",           "desc": "Runs Batted In (Mais de/Menos de)"},
-    "runs":     {"under": "Menos de {n} Runs",                     "over": "Mais de {n} Runs",                     "desc": "Runs (Mais de/Menos de)"},
-    "TB":       {"under": "Menos de {n} Total de Bases",           "over": "Mais de {n} Total de Bases",           "desc": "Total de Bases (Mais de/Menos de)"},
-    "HRR":      {"under": "Menos de {n} Total Hits+Runs+RBIs",     "over": "Mais de {n} Total Hits+Runs+RBIs",     "desc": "Total de Hits, Runs e RBIs"},
-    "SB":       {"under": "Menos de {n} Bases Roubadas",           "over": "Mais de {n} Bases Roubadas",           "desc": "Bases Roubadas (Mais de/Menos de)"},
+    # ── MLB — Lançador ─────────────────────────────────────────────────
+    "K":        {"under": "Menos de {n} Strikeouts",           "over": "Mais de {n} Strikeouts",           "desc": "Strikeouts do lançador (K = Strikeout no beisebol)"},
+    "Ks":       {"under": "Menos de {n} Strikeouts",           "over": "Mais de {n} Strikeouts",           "desc": "Strikeouts do lançador"},
+    "HA":       {"under": "Menos de {n} Hits Permitidos",      "over": "Mais de {n} Hits Permitidos",      "desc": "Hits Permitidos pelo lançador"},
+    "H":        {"under": "Menos de {n} Hits Permitidos",      "over": "Mais de {n} Hits Permitidos",      "desc": "Hits Permitidos pelo lançador (H = Hits)"},
+    "ER":       {"under": "Menos de {n} Earned Runs",          "over": "Mais de {n} Earned Runs",          "desc": "Runs sofridos pelo lançador (excluindo erros)"},
+    "BB":       {"under": "Menos de {n} Walks Atribuídos",     "over": "Mais de {n} Walks Atribuídos",     "desc": "Walks (bases por bolas) concedidos pelo lançador"},
+    "outs":     {"under": "Menos de {n} Outs (~{inn} inn)",    "over": "Mais de {n} Outs (~{inn} inn)",    "desc": "Outs registrados pelo lançador (3 outs = 1 inning)"},
+    "IP":       {"under": "Menos de {n} Innings",              "over": "Mais de {n} Innings",              "desc": "Innings lançados (IP = Innings Pitched)"},
+    # ── MLB — Rebatedor ────────────────────────────────────────────────
+    "hits":     {"under": "Menos de {n} Hits",                 "over": "Mais de {n} Hits",                 "desc": "Hits do rebatedor"},
+    "HR":       {"under": "Menos de {n} Home Runs",            "over": "Mais de {n} Home Runs",            "desc": "Home Runs do rebatedor"},
+    "RBI":      {"under": "Menos de {n} Runs Batted In",       "over": "Mais de {n} Runs Batted In",       "desc": "Runs impulsionados pelo rebatedor (RBI)"},
+    "runs":     {"under": "Menos de {n} Runs",                 "over": "Mais de {n} Runs",                 "desc": "Runs marcados pelo rebatedor"},
+    "TB":       {"under": "Menos de {n} Total de Bases",       "over": "Mais de {n} Total de Bases",       "desc": "Total de Bases (1B=1, 2B=2, 3B=3, HR=4)"},
+    "HRR":      {"under": "Menos de {n} Hits+Runs+RBIs",       "over": "Mais de {n} Hits+Runs+RBIs",       "desc": "Combinado: Hits + Runs + RBIs do rebatedor"},
+    "SB":       {"under": "Menos de {n} Bases Roubadas",       "over": "Mais de {n} Bases Roubadas",       "desc": "Bases roubadas pelo rebatedor"},
     # ── NBA / WNBA — Player Props ──────────────────────────────────────
-    "PRA":      {"under": "Menos de {n} Pts+Reb+Ast",              "over": "Mais de {n} Pts+Reb+Ast",              "desc": "Pontos + Rebotes + Assistências do jogador"},
-    "points":   {"under": "Menos de {n} Pontos",                   "over": "Mais de {n} Pontos",                   "desc": "Pontos marcados pelo jogador"},
-    "assists":  {"under": "Menos de {n} Assistências",             "over": "Mais de {n} Assistências",             "desc": "Assistências do jogador"},
-    "rebounds": {"under": "Menos de {n} Rebotes",                  "over": "Mais de {n} Rebotes",                  "desc": "Rebotes do jogador"},
-    "PR":       {"under": "Menos de {n} Pts+Reb",                  "over": "Mais de {n} Pts+Reb",                  "desc": "Pontos + Rebotes do jogador"},
-    "PA":       {"under": "Menos de {n} Pts+Ast",                  "over": "Mais de {n} Pts+Ast",                  "desc": "Pontos + Assistências do jogador"},
-    "RA":       {"under": "Menos de {n} Reb+Ast",                  "over": "Mais de {n} Reb+Ast",                  "desc": "Rebotes + Assistências do jogador"},
-    "3PM":      {"under": "Menos de {n} Cestas de 3 Pontos",       "over": "Mais de {n} Cestas de 3 Pontos",       "desc": "Cestas de 3 pontos convertidas"},
-    "blocks":   {"under": "Menos de {n} Bloqueios",                "over": "Mais de {n} Bloqueios",                "desc": "Bloqueios (tocos) do jogador"},
-    "steals":   {"under": "Menos de {n} Roubos de Bola",           "over": "Mais de {n} Roubos de Bola",           "desc": "Roubos de bola do jogador"},
-    "mins":     {"under": "Menos de {n} Minutos",                  "over": "Mais de {n} Minutos",                  "desc": "Minutos em quadra"},
+    "PRA":      {"under": "Menos de {n} Pts+Reb+Ast",          "over": "Mais de {n} Pts+Reb+Ast",          "desc": "Combinado: Pontos + Rebotes + Assistências"},
+    "points":   {"under": "Menos de {n} Pontos",               "over": "Mais de {n} Pontos",               "desc": "Pontos marcados pelo jogador"},
+    "pts":      {"under": "Menos de {n} Pontos",               "over": "Mais de {n} Pontos",               "desc": "Pontos marcados pelo jogador"},
+    "assists":  {"under": "Menos de {n} Assistências",         "over": "Mais de {n} Assistências",         "desc": "Assistências do jogador"},
+    "ast":      {"under": "Menos de {n} Assistências",         "over": "Mais de {n} Assistências",         "desc": "Assistências do jogador"},
+    "rebounds": {"under": "Menos de {n} Rebotes",              "over": "Mais de {n} Rebotes",              "desc": "Rebotes do jogador"},
+    "reb":      {"under": "Menos de {n} Rebotes",              "over": "Mais de {n} Rebotes",              "desc": "Rebotes do jogador"},
+    "PR":       {"under": "Menos de {n} Pts+Reb",              "over": "Mais de {n} Pts+Reb",              "desc": "Combinado: Pontos + Rebotes"},
+    "PA":       {"under": "Menos de {n} Pts+Ast",              "over": "Mais de {n} Pts+Ast",              "desc": "Combinado: Pontos + Assistências"},
+    "RA":       {"under": "Menos de {n} Reb+Ast",              "over": "Mais de {n} Reb+Ast",              "desc": "Combinado: Rebotes + Assistências"},
+    "3PM":      {"under": "Menos de {n} Cestas de 3 Pontos",   "over": "Mais de {n} Cestas de 3 Pontos",   "desc": "Cestas de 3 pontos convertidas"},
+    "3s":       {"under": "Menos de {n} Cestas de 3 Pontos",   "over": "Mais de {n} Cestas de 3 Pontos",   "desc": "Cestas de 3 pontos convertidas"},
+    "blocks":   {"under": "Menos de {n} Bloqueios",            "over": "Mais de {n} Bloqueios",            "desc": "Bloqueios (tocos) do jogador"},
+    "blk":      {"under": "Menos de {n} Bloqueios",            "over": "Mais de {n} Bloqueios",            "desc": "Bloqueios (tocos) do jogador"},
+    "steals":   {"under": "Menos de {n} Roubos de Bola",       "over": "Mais de {n} Roubos de Bola",       "desc": "Roubos de bola do jogador"},
+    "stl":      {"under": "Menos de {n} Roubos de Bola",       "over": "Mais de {n} Roubos de Bola",       "desc": "Roubos de bola do jogador"},
+    "mins":     {"under": "Menos de {n} Minutos",              "over": "Mais de {n} Minutos",              "desc": "Minutos em quadra"},
+    "min":      {"under": "Menos de {n} Minutos",              "over": "Mais de {n} Minutos",              "desc": "Minutos em quadra"},
+    "TO":       {"under": "Menos de {n} Turnovers",            "over": "Mais de {n} Turnovers",            "desc": "Turnovers (perdas de bola) do jogador"},
+    # ── NFL ────────────────────────────────────────────────────────────
+    "pass_yds": {"under": "Menos de {n} Jardas (Passe)",       "over": "Mais de {n} Jardas (Passe)",       "desc": "Jardas de passe do quarterback"},
+    "rush_yds": {"under": "Menos de {n} Jardas (Corrida)",     "over": "Mais de {n} Jardas (Corrida)",     "desc": "Jardas de corrida do jogador"},
+    "rec_yds":  {"under": "Menos de {n} Jardas (Recepção)",    "over": "Mais de {n} Jardas (Recepção)",    "desc": "Jardas de recepção do jogador"},
+    "TD":       {"under": "Menos de {n} Touchdowns",           "over": "Mais de {n} Touchdowns",           "desc": "Touchdowns marcados/lançados"},
+    "rec":      {"under": "Menos de {n} Recepções",            "over": "Mais de {n} Recepções",            "desc": "Recepções do wide receiver/tight end"},
+    # ── NHL ────────────────────────────────────────────────────────────
+    "shots":    {"under": "Menos de {n} Chutes a Gol",         "over": "Mais de {n} Chutes a Gol",         "desc": "Chutes a gol (shots on goal)"},
+    "goals":    {"under": "Menos de {n} Gols",                 "over": "Mais de {n} Gols",                 "desc": "Gols marcados pelo jogador"},
+    "saves":    {"under": "Menos de {n} Defesas",              "over": "Mais de {n} Defesas",              "desc": "Defesas do goleiro (saves)"},
 }
 
 # ============================================================
@@ -136,26 +157,61 @@ def parse_picks(text: str) -> list[dict]:
 # INTERPRETA O MERCADO
 # ============================================================
 def interpret_market(market_raw: str) -> dict:
-    m = re.search(r'([uo])([\d.]+)\s+([A-Za-z]+)(?:\s|$)', market_raw.strip(), re.IGNORECASE)
-    if not m:
-        m = re.match(r'^([uo])([\d.]+)\s*(.+)$', market_raw.strip(), re.IGNORECASE)
-    if not m:
-        return {"direction": None, "line": None, "code": market_raw, "label": market_raw, "desc": None}
+    """
+    Extrai direção, linha e código do mercado.
+    Suporta:
+      - 'u4.5 K'                    → under 4.5 K
+      - 'o5.5 HA'                   → over 5.5 HA
+      - 'Brandon Sproat u4.5 K'     → under 4.5 K (jogador antes)
+      - 'Brandon Sproat 4.5 K'      → sem direção explícita, extrai linha+código
+      - 'LeBron James o25.5 points' → over 25.5 points
+    """
+    raw = market_raw.strip()
 
-    direction = m.group(1).lower()
-    line      = m.group(2)
-    code      = m.group(3).strip()
-    direction_word = "under" if direction == "u" else "over"
+    # 1. Tenta encontrar [u/o][número] [código] em qualquer posição
+    m = re.search(r'\b([uo])([\d.]+)\s+([A-Za-z_]+)\b', raw, re.IGNORECASE)
+    if m:
+        direction = m.group(1).lower()
+        line      = m.group(2)
+        code      = m.group(3)
+    else:
+        # 2. Fallback: número + código no final da string (sem direção)
+        m = re.search(r'([\d.]+)\s+([A-Za-z_]+)\s*$', raw)
+        if m:
+            direction = None
+            line      = m.group(1)
+            code      = m.group(2)
+        else:
+            return {"direction": None, "line": None, "code": raw, "label": raw, "desc": None, "player": None}
+
+    # Extrai nome do jogador (tudo antes do padrão encontrado)
+    player_match = re.match(r'^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\s+', raw)
+    player = player_match.group(1) if player_match else None
+
+    direction_word = "under" if direction == "u" else ("over" if direction == "o" else None)
 
     mkt = MARKET_TRANSLATIONS.get(code, {})
-    label_tmpl = mkt.get(direction_word, f"{direction.upper()}{line} {code}")
-    desc_tmpl  = mkt.get("desc", None)
+
+    if direction_word:
+        label_tmpl = mkt.get(direction_word, f"{direction.upper()}{line} {code}")
+    else:
+        # Sem direção: mostra ambos os lados possíveis
+        label_tmpl = mkt.get("over", f"{line} {code}").replace("Mais de", "±")
+
+    desc_tmpl = mkt.get("desc", None)
 
     innings = str(round(float(line) / 3, 1)) if code == "outs" else ""
     label = label_tmpl.replace("{n}", line).replace("{inn}", innings)
-    desc  = desc_tmpl.replace("{n}", line).replace("{inn}", innings) if desc_tmpl else None
+    desc  = desc_tmpl if desc_tmpl else None
 
-    return {"direction": direction, "line": line, "code": code, "label": label, "desc": desc}
+    return {
+        "direction": direction,
+        "line":      line,
+        "code":      code,
+        "label":     label,
+        "desc":      desc,
+        "player":    player,
+    }
 
 # ============================================================
 # FORMATA A RESPOSTA (HTML)
@@ -181,24 +237,38 @@ def format_response(picks: list[dict], original_text: str) -> str:
         sport_emoji = get_sport_emoji(p["title"])
         title_str  = escape(p["title"]) if p["title"] else "Pick detectado"
         title_line = f"{sport_emoji} <b>{title_str}</b>"
-        label_esc  = escape(mkt["label"])
-        market_esc = escape(p["market"])
+
+        # Linha de mercado: mostra jogador separado se detectado
+        if mkt["player"]:
+            player_line = f"👤 {escape(mkt['player'])}\n"
+        else:
+            player_line = ""
+
+        dir_sym = ""
+        if mkt["direction"] == "u":
+            dir_sym = "🔵 UNDER"
+        elif mkt["direction"] == "o":
+            dir_sym = "🔴 OVER"
+
+        market_line = f"{dir_sym} {escape(mkt['line'])} → {escape(mkt['label'])}" if mkt["direction"] else escape(mkt["label"])
 
         glossary_block = ""
         if mkt["desc"]:
-            code_tag = f"{(mkt['direction'] or '').upper()}{mkt['line']} {mkt['code']}"
+            code_str = f"{(mkt['direction'] or '').upper()}{mkt['line']} {mkt['code']}"
             glossary_block = (
                 f"\n📖 <b>O que significa:</b>\n"
-                f"• <code>{escape(code_tag)}</code> → {escape(mkt['desc'])}"
+                f"• <code>{escape(code_str)}</code> → {escape(mkt['desc'])}"
             )
 
+        # Termo de busca: palavras-chave do label
         label_words = mkt["label"].split()
         search_term = escape(" ".join(label_words[2:]) if len(label_words) > 2 else mkt["code"])
 
         blocks.append(
             f"{title_line}\n"
             f"💰 <b>{escape(units)}</b>\n"
-            f"🎟️ {market_esc} → {label_esc}\n"
+            f"{player_line}"
+            f"🎟️ {market_line}\n"
             f"📉 Odd americana: <code>{odd_str}</code>\n"
             f"📈 Odd decimal: <b>{odd_br_str}</b>\n"
             f"🚫 Odd mínima: <b>{odd_min_str}</b>\n"
@@ -220,7 +290,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         text = update.message.text
 
-        # Ignora mensagens do próprio bot
         if "Odd americana:" in text or "Odds convertidas" in text:
             return
 
